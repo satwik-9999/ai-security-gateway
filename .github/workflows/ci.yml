@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+
+      - name: Run Ruff Linter and Formatter Check
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run Pytest with Coverage
+        run: |
+          pytest --cov=gateway --cov-report=term-missing --cov-fail-under=85 tests/
+
+      - name: Run Evaluation Benchmark Verification
+        run: |
+          python eval/run_eval.py
