@@ -1,0 +1,32 @@
+name: balanced
+description: Balanced policy for standard enterprise productivity, masking benign PII and blocking credentials and high-risk injection.
+injection_threshold: 0.60
+max_prompt_length: 12000
+allowed_models:
+  - gemini-2.5-flash-lite
+  - mock-model
+  - gpt-4o-mini
+  - "*"
+
+default_data_action: mask
+
+data_type_actions:
+  EMAIL: mask
+  PHONE: mask
+  IP_ADDRESS: mask
+  PERSON_NAME: mask
+  CREDIT_CARD: block
+  IBAN: block
+  GOV_ID: block
+  API_KEY: block
+
+group_overrides:
+  developers:
+    data_type_actions:
+      IP_ADDRESS: allow
+      API_KEY: block
+    max_prompt_length: 20000
+  customer_support:
+    data_type_actions:
+      PHONE: mask
+      EMAIL: mask

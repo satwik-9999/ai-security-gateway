@@ -1,0 +1,23 @@
+name: strict
+description: Strict security policy blocking any sensitive data transmission and enforcing low injection tolerance.
+injection_threshold: 0.40
+max_prompt_length: 6000
+allowed_models:
+  - gemini-2.5-flash-lite
+  - mock-model
+
+default_data_action: block
+
+data_type_actions:
+  EMAIL: block
+  PHONE: block
+  IP_ADDRESS: block
+  PERSON_NAME: block
+  CREDIT_CARD: block
+  IBAN: block
+  GOV_ID: block
+  API_KEY: block
+
+group_overrides:
+  executives:
+    injection_threshold: 0.35
