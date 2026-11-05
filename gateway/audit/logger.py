@@ -1,6 +1,7 @@
 """Privacy-preserving SQLite audit logger storing salted hashes and aggregate detection counts."""
 
 import hashlib
+import secrets
 import json
 import sqlite3
 from datetime import datetime, timezone
@@ -32,7 +33,7 @@ class AuditLogger:
 
     def __init__(self, db_path: str = "gateway.db", salt: Optional[str] = None):
         self.db_path = db_path
-        self.salt = salt or "default_secret_salt_for_prompt_hashing"
+        self.salt = salt or secrets.token_urlsafe(32)
         self._init_db()
 
     def _init_db(self):

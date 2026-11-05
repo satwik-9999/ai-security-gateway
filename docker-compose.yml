@@ -7,13 +7,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - GATEWAY_HOST=0.0.0.0
-      - GATEWAY_PORT=8000
-      - GATEWAY_AUDIT_SALT=docker_development_salt_key_1234
-      - GATEWAY_ADMIN_API_KEY=admin-secret-key-change-me
-      - GATEWAY_POLICY_PATH=policies/balanced.yaml
-      - LLM_PROVIDER=mock
-      - AUDIT_DB_PATH=/app/data/gateway.db
+      GATEWAY_HOST: 0.0.0.0
+      GATEWAY_PORT: 8000
+      GATEWAY_AUDIT_SALT: ${GATEWAY_AUDIT_SALT:?Set GATEWAY_AUDIT_SALT in your environment}
+      GATEWAY_ADMIN_API_KEY: ${GATEWAY_ADMIN_API_KEY:?Set GATEWAY_ADMIN_API_KEY in your environment}
+      GATEWAY_POLICY_PATH: policies/balanced.yaml
+      LLM_PROVIDER: mock
+      AUDIT_DB_PATH: /app/data/gateway.db
     volumes:
       - gateway-data:/app/data
     restart: unless-stopped
@@ -25,7 +25,7 @@ services:
     ports:
       - "8501:8501"
     environment:
-      - AUDIT_DB_PATH=/app/data/gateway.db
+      AUDIT_DB_PATH: /app/data/gateway.db
     volumes:
       - gateway-data:/app/data
     depends_on:

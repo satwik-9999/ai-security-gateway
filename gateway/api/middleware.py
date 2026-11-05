@@ -1,5 +1,6 @@
 """Security middleware: rate limiting and admin authentication."""
 
+import hmac
 import time
 from typing import Callable, Dict, List, Optional
 
@@ -34,11 +35,16 @@ class RateLimiter:
         self.user_requests[user_id] = timestamps
 
 
-def create_admin_verifier(configured_key: str) -> Callable:
+def create_admin_verifier(configured_key: Optional[str]) -> Callable:
     """Creates a FastAPI dependency function that validates X-Admin-Key header against configured_key."""
 
     def verify_admin_key(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")) -> bool:
-        if not x_admin_key or x_admin_key != configured_key:
+        if not configured_key:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Admin authentication is not configured.",
+            )
+        if not x_admin_key or not hmac.compare_digest(x_admin_key, configured_key):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or missing X-Admin-Key authentication header.",

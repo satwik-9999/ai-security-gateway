@@ -1,5 +1,6 @@
 """FastAPI application factory and security gateway routing."""
 
+import os
 import time
 import uuid
 from typing import Optional
@@ -29,8 +30,8 @@ from gateway.providers.mock import MockProvider
 def create_app(
     policy_path: str = "policies/balanced.yaml",
     db_path: str = "gateway.db",
-    salt: str = "default_audit_salt",
-    admin_key: str = "admin-secret-key-change-me",
+    salt: Optional[str] = None,
+    admin_key: Optional[str] = None,
     provider: Optional[BaseLLMProvider] = None,
     include_ner: bool = True,
 ) -> FastAPI:
@@ -41,6 +42,12 @@ def create_app(
         description="Enterprise reverse proxy for DLP and Prompt Injection Defense",
         version="0.1.0",
     )
+
+    # Resolve sensitive settings from explicit arguments or the environment.
+    if salt is None:
+        salt = os.getenv("GATEWAY_AUDIT_SALT")
+    if admin_key is None:
+        admin_key = os.getenv("GATEWAY_ADMIN_API_KEY")
 
     # Initialize components
     policy_engine = PolicyEngine.from_yaml_file(policy_path)
