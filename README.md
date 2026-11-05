@@ -47,8 +47,12 @@ Run the gateway and dashboard completely offline without any API keys:
 
 ```bash
 # 1. Clone repository & install dependencies
-git clone https://github.com/enterprise/ai-security-gateway.git && cd ai-security-gateway
+git clone https://github.com/satwik-9999/ai-security-gateway.git && cd ai-security-gateway
 pip install -e ".[dev]"
+
+# Set these to unique random values and keep them stable across restarts.
+export GATEWAY_AUDIT_SALT="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export GATEWAY_ADMIN_API_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
 
 # 2. Run test suite (85%+ coverage enforcement)
 pytest --cov=gateway --cov-report=term-missing tests/
@@ -60,7 +64,9 @@ uvicorn gateway.api.app:create_app --port 8000 --factory
 streamlit run dashboard/app.py --server.port 8501
 ```
 
-*(Optional: Set `LLM_PROVIDER=gemini` and export `GEMINI_API_KEY=your_key` in `.env` to connect to Gemini 2.5 Flash Lite.)*
+The admin audit endpoint is disabled until `GATEWAY_ADMIN_API_KEY` is configured. Set `GATEWAY_AUDIT_SALT` to a stable random value and keep it private; changing it prevents matching prompt hashes across restarts. Docker Compose requires both values from your shell or `.env` file.
+
+*(Optional: Set `LLM_PROVIDER=gemini` and export `GEMINI_API_KEY=your_key` to connect to Gemini 2.5 Flash Lite.)*
 
 ---
 
